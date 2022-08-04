@@ -55,8 +55,13 @@ up(ConnArgs, Migrations) ->
     lists:foreach(
       fun(Mig) ->
           case applied(Conn, Mig) of
-              true  -> ok;
-              false -> Fun = fun() -> update(Conn,Mig) end,
+              true  ->
+                  io:format("~n applied: ~p", [true]),%%TODO del
+                  ok;
+              false ->
+                io:format("~n applied: ~p", [false]),%%TODO del
+
+                  Fun = fun() -> update(Conn,Mig) end,
                        transaction(Conn, Mig#migration.up, Fun)
           end
       end, Migrations),
@@ -101,14 +106,14 @@ down(ConnArgs, Migrations) ->
 %%
 %% @doc Close existing connection to the postgres database
 disconnect(Conn) ->
-    pgsql:close(Conn).
+    epgsql:close(Conn).
 
 %% @spec connect(ConnArgs) -> pid()
 %%       ConnArgs = list()
 %%
 %% @doc Connect to the postgres database using epgsql
 connect([Hostname, Port, Database, Username, Password]) ->
-    case pgsql:connect(Hostname, Username, Password,
+    case epgsql:connect(Hostname, Username, Password,
                        [{database, Database}, {port, Port}]) of
         {ok,Conn} -> Conn;
         {error, Error} -> throw(Error)
@@ -134,7 +139,7 @@ transaction(Conn, Sql, Fun) ->
 %%
 %% @doc Execute a sql statement calling epgsql
 squery(Conn, Sql) ->
-    case pgsql:squery(Conn, Sql) of
+    case epgsql:squery(Conn, Sql) of
         {error, Error} -> throw(Error);
         Result -> Result
     end.
@@ -146,7 +151,7 @@ squery(Conn, Sql) ->
 %%
 %% @doc Execute a sql statement calling epgsql with parameters.
 equery(Conn, Sql, Params) ->
-    case pgsql:equery(Conn, Sql, Params) of
+    case epgsql:equery(Conn, Sql, Params) of
         {error, Error} -> throw(Error);
         Result -> Result
     end.

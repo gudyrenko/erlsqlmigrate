@@ -38,9 +38,14 @@
 create(Config, _MigDir, []) ->
     run_driver(Config,create,[]);
 create([{Driver,_ConnArgs}]=Config,MigDir,Name) ->
+        io:format("~n Name: ~p", [Name]),%%TODO del
+
     filelib:ensure_dir(?UPDIR(MigDir,Driver)++"/"),
     filelib:ensure_dir(?DOWNDIR(MigDir,Driver)++"/"),
     Migration= get_migration(Driver,MigDir,Name),
+    io:format("~n Migration: ~p", [Migration]),%%TODO del
+%%    io:format("~n Migration#migration.yaml_path: ~p", [Migration#migration.yaml_path]),%%TODO del
+
     file:write_file(Migration#migration.up_path, <<"">>),
     file:write_file(Migration#migration.down_path, <<"">>),
     erlsqlmigrate_core:create(Config, MigDir, []).
@@ -95,6 +100,8 @@ down([{Driver,_ConnArgs}]=Config, MigDir, Name) ->
 %% @throws unknown_database
 %% @doc Runs command on the driver for the specified database
 run_driver([{pgsql,ConnArgs}],Cmd,Args) ->
+    io:format("~n Cmd: ~p", [Cmd]),%%TODO del
+    io:format("~n ConnArgs: ~p", [ConnArgs]),%%TODO del
     erlsqlmigrate_driver_pg:Cmd(ConnArgs,Args);
 run_driver([{mysql,ConnArgs}],Cmd,Args) ->
     erlsqlmigrate_driver_my:Cmd(ConnArgs,Args);
