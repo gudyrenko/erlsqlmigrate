@@ -47,7 +47,10 @@ create([{Driver,_ConnArgs}]=Config,MigDir,Name) ->
 %%    io:format("~n Migration#migration.yaml_path: ~p", [Migration#migration.yaml_path]),%%TODO del
 
     file:write_file(Migration#migration.up_path, <<"">>),
-    file:write_file(Migration#migration.down_path, <<"">>),
+    UpPath = filename:join([MigDir,"up"]) ++ "/" ++ Name ++ ".sql",
+    DownPath = filename:join([MigDir,"down"]) ++ "/" ++ Name ++ ".sql",
+    file:copy(UpPath, Migration#migration.up_path),
+    file:copy(DownPath, Migration#migration.down_path),
     erlsqlmigrate_core:create(Config, MigDir, []).
 
 %% @spec up([{DB,ConnArgs}], MigDir, Name) -> ok
