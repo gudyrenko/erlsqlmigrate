@@ -58,6 +58,7 @@ up(ConnArgs, Migrations) ->
               true  ->
                   ok;
               false ->
+                  logger:info("~n Mig: ~p", [Mig]),%%TODO del
                   Fun = fun() -> update(Conn,Mig) end,
                        transaction(Conn, Mig#migration.up, Fun)
           end

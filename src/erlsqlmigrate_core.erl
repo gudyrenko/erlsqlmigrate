@@ -63,7 +63,9 @@ up([{Driver,_ConnArgs}]=Config, MigDir, Name) ->
             end,
     %% I think its sorted but anyway
     Files = lists:sort(filelib:wildcard(?UPDIR(MigDir,Driver)++"/"++Regex)),
+    logger:info("~n Files: ~p", [Files]),
     Migrations = get_migrations(Driver, MigDir, Files),
+    logger:info("~n Migrations: ~p", [Migrations]),
     run_driver(Config, up, Migrations).
 
 %% @spec down([{DB,ConnArgs}], MigDir, Name) -> ok
