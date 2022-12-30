@@ -143,9 +143,14 @@ get_migrations(Driver, MigDir, Files) ->
               {match,[Timestamp,Name]} ->
                   Up = readlines(F),
                   Fd = re:replace(F, "/up/", "/down/", [global, {return, list}]),
-                  Down = readlines(Fd),
-                  get_migration(Driver, MigDir,
-                                {Name,list_to_integer(Timestamp),Up,Down});
+                  try
+                      Down = readlines(Fd),
+                      get_migration(Driver, MigDir, {Name, list_to_integer(Timestamp), Up, Down})
+                  catch
+                      error:{badmatch,{error,enoent}}:_ ->
+                          ok = file:delete(F),
+                          throw(need_to_create_file_migration_down)
+                  end;
               nomatch -> throw(file_not_a_migration_file)
           end
       end,
